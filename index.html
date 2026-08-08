@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Board</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="auth-view">
+    <div class="auth-card">
+      <h1>Task Board</h1>
+      <input type="email" id="auth-email" placeholder="Email">
+      <input type="password" id="auth-password" placeholder="Password">
+      <div class="auth-buttons">
+        <button id="login-btn">Log In</button>
+        <button id="signup-btn">Sign Up</button>
+      </div>
+      <p id="auth-error" class="error" hidden></p>
+    </div>
+  </div>
+
+  <div id="app-view" hidden>
+    <header>
+      <h1>My Boards</h1>
+      <button id="logout-btn">Log Out</button>
+    </header>
+
+    <section class="new-board">
+      <input type="text" id="board-title" placeholder="New board title">
+      <button id="add-board-btn">Add Board</button>
+    </section>
+
+    <section id="boards-list"></section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
