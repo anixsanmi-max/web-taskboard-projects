@@ -12,3 +12,11 @@ A calculator built with vanilla HTML, CSS, and JavaScript — no libraries.
 ## Why not `eval()`?
 
 `eval()` would technically work for a calculator, but it executes arbitrary JavaScript from a string. Writing a small parser instead (see `evaluateExpression` in `script.js`) is safer and is a genuinely useful exercise in how calculators/interpreters actually work under the hood — it follows this grammar:
+
+expression -> term (('+' | '-') term)*
+term       -> factor (('*' | '/') factor)*
+factor     -> number | '(' expression ')' | '-' factor
+
+## Run it
+
+Just open `index.html` in a browser — no build step needed.
