@@ -1,96 +1,140 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+const display = document.getElementById('display');
+const buttons = document.querySelectorAll('.buttons button');
+
+let expression = '';
+
+function updateDisplay() {
+  display.value = expression || '0';
 }
 
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #1a1d29;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+function clearAll() {
+  expression = '';
+  updateDisplay();
 }
 
-.calculator {
-  background: #23273a;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  width: 320px;
-  max-width: 92vw;
+function backspace() {
+  expression = expression.slice(0, -1);
+  updateDisplay();
 }
 
-#display {
-  width: 100%;
-  height: 70px;
-  margin-bottom: 16px;
-  border: none;
-  border-radius: 10px;
-  background: #14161f;
-  color: #ffffff;
-  font-size: 2rem;
-  text-align: right;
-  padding: 0 16px;
-  font-family: inherit;
-}
+function appendValue(value) {
+  // Prevent two operators in a row (except a leading minus for negative numbers)
+  const lastChar = expression.slice(-1);
+  const isOperator = ch => ['+', '-', '*', '/'].includes(ch);
 
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-button {
-  height: 60px;
-  border: none;
-  border-radius: 10px;
-  background: #2f3450;
-  color: #ffffff;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: transform 0.08s ease, background 0.15s ease;
-}
-
-button:hover {
-  background: #3a4066;
-}
-
-button:active {
-  transform: scale(0.94);
-}
-
-button.op {
-  background: #4a3a6b;
-  color: #d9c9ff;
-}
-
-button.op:hover {
-  background: #5c4a85;
-}
-
-#equals {
-  background: #e08a3c;
-  color: #1a1d29;
-  font-weight: bold;
-  grid-column: span 1;
-}
-
-#equals:hover {
-  background: #f19a4a;
-}
-
-@media (max-width: 360px) {
-  .calculator {
-    padding: 14px;
+  if (isOperator(value) && isOperator(lastChar)) {
+    expression = expression.slice(0, -1) + value; // replace, don't stack operators
+  } else {
+    expression += value;
   }
-  #display {
-    height: 60px;
-    font-size: 1.6rem;
+  updateDisplay();
+}
+
+/*
+ * Safe expression evaluator.
+ * We avoid raw `eval()` on user input and instead implement a small
+ * recursive-descent parser that respects operator precedence
+ * (multiplication/division before addition/subtraction) and parentheses.
+ *
+ * Grammar:
+ *   expression -> term (('+' | '-') term)*
+ *   term       -> factor (('*' | '/') factor)*
+ *   factor     -> number | '(' expression ')' | '-' factor
+ */
+function evaluateExpression(expr) {
+  let pos = 0;
+
+  function peek() {
+    return expr[pos];
   }
-  button {
-    height: 52px;
-    font-size: 1.05rem;
+
+  function consumeNumber() {
+    let start = pos;
+    while (pos < expr.length && /[0-9.]/.test(expr[pos])) pos++;
+    if (start === pos) throw new Error('Expected a number');
+    return parseFloat(expr.slice(start, pos));
+  }
+
+  function parseFactor() {
+    if (peek() === '(') {
+      pos++; // consume '('
+      const value = parseExpression();
+      if (peek() !== ')') throw new Error('Missing closing parenthesis');
+      pos++; // consume ')'
+      return value;
+    }
+    if (peek() === '-') {
+      pos++;
+      return -parseFactor();
+    }
+    return consumeNumber();
+  }
+
+  function parseTerm() {
+    let value = parseFactor();
+    while (peek() === '*' || peek() === '/') {
+      const operator = expr[pos];
+      pos++;
+      const rhs = parseFactor();
+      if (operator === '*') value *= rhs;
+      else {
+        if (rhs === 0) throw new Error('Division by zero');
+        value /= rhs;
+      }
+    }
+    return value;
+  }
+
+  function parseExpression() {
+    let value = parseTerm();
+    while (peek() === '+' || peek() === '-') {
+      const operator = expr[pos];
+      pos++;
+      const rhs = parseTerm();
+      value = operator === '+' ? value + rhs : value - rhs;
+    }
+    return value;
+  }
+
+  const result = parseExpression();
+  if (pos !== expr.length) throw new Error('Unexpected character in expression');
+  return result;
+}
+
+function calculate() {
+  try {
+    const result = evaluateExpression(expression.replace(/\s+/g, ''));
+    expression = String(Math.round(result * 1e10) / 1e10); // trim floating point noise
+    updateDisplay();
+  } catch (err) {
+    display.value = 'Error';
+    expression = '';
   }
 }
+
+// Button clicks
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    const value = button.dataset.value;
+    if (value === 'C') clearAll();
+    else if (value === 'backspace') backspace();
+    else if (value === '=') calculate();
+    else appendValue(value);
+  });
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (/[0-9.+\-*/()]/.test(e.key)) {
+    appendValue(e.key);
+  } else if (e.key === 'Enter' || e.key === '=') {
+    e.preventDefault();
+    calculate();
+  } else if (e.key === 'Backspace') {
+    backspace();
+  } else if (e.key === 'Escape') {
+    clearAll();
+  }
+});
+
+updateDisplay();
