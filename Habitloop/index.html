@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habitloop — Personal Habit Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark">
+
+  <header class="site-header">
+    <div class="brand">Habitloop</div>
+    <nav aria-label="Primary">
+      <a href="#habits">Habits</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button id="theme-toggle" aria-label="Toggle light and dark theme">🌙</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Small streaks, kept honest.</h1>
+        <p>Track daily habits with a single tap. No accounts, no noise — just today's ring, growing one day at a time.</p>
+        <button id="open-add-habit" class="btn-primary">Add a habit</button>
+      </div>
+
+      <div class="streak-ring" aria-hidden="true">
+        <svg viewBox="0 0 160 160" width="160" height="160">
+          <circle class="ring-track" cx="80" cy="80" r="70"></circle>
+          <circle id="ring-progress" class="ring-progress" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="ring-label">
+          <span id="ring-count">0</span>
+          <small>day streak</small>
+        </div>
+      </div>
+    </section>
+
+    <section id="habits" aria-labelledby="habits-heading">
+      <h2 id="habits-heading">Today's habits</h2>
+      <ul id="habit-list" class="habit-list"></ul>
+      <p id="empty-state" class="empty-state">No habits yet — add your first one above.</p>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">FAQ</h2>
+      <div class="accordion">
+        <article class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            Where is my data stored?
+          </button>
+          <div class="accordion-panel">
+            <p>Everything stays in your browser's local storage. Nothing is sent anywhere, and clearing your browser data will reset it.</p>
+          </div>
+        </article>
+        <article class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            How does the streak count work?
+          </button>
+          <div class="accordion-panel">
+            <p>Every habit you mark complete today adds one to the ring. Marking it complete again the same day won't double-count it.</p>
+          </div>
+        </article>
+        <article class="accordion-item">
+          <button class="accordion-trigger" aria-expanded="false">
+            Can I delete a habit?
+          </button>
+          <div class="accordion-panel">
+            <p>Yes — each habit has a remove button beside it. Deleting is immediate and can't be undone.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="add-habit-modal" class="modal" hidden>
+    <div class="modal-content" role="dialog" aria-labelledby="modal-heading" aria-modal="true">
+      <h2 id="modal-heading">New habit</h2>
+      <form id="add-habit-form" novalidate>
+        <label for="habit-name">Habit name</label>
+        <input type="text" id="habit-name" name="habit-name" maxlength="40" placeholder="e.g. Read 10 pages" required>
+        <p class="field-error" id="habit-name-error" hidden>Enter a name, up to 40 characters.</p>
+        <div class="modal-actions">
+          <button type="button" id="cancel-add-habit" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Add habit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Built as a personal front-end practice project — semantic HTML5, responsive CSS3, vanilla JS.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
