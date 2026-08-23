@@ -1,4 +1,5 @@
 # Calculator App
+**Live demo:** https://anixsanmi-max.github.io/web-taskboard-projects/calculator-app/
 
 A calculator built with vanilla HTML, CSS, and JavaScript — no libraries.
 
